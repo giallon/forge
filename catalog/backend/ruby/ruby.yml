@@ -1,0 +1,15 @@
+services:
+  ruby:
+    context: .
+    dockerfile: Dockerfile
+  
+  working_dir: /workspace
+
+  volumes:
+    - .:/workspace
+    - bundle_cache:/usr/local/bundle
+  
+  stdin: true
+  tty: true
+volumes:
+  bundle_cache:
