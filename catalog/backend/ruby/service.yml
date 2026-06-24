@@ -3,9 +3,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    working_dir: /workspace
+    working_dir: /workspaces
     volumes:
-      - .:/workspace
+      - ../..:/workspaces
       - bundle_cache:/usr/local/bundle
     stdin_open: true
     tty: true
