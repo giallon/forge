@@ -58,6 +58,14 @@ ops/
 └── powersync/
 ```
 
+Generate a root Docker Compose file from the copied module manifests:
+
+```bash
+forge compose
+```
+
+This writes `docker-compose.yml` in the current project root.
+
 ## Example
 
 Add reusable services from Forge:
@@ -70,13 +78,12 @@ forge add powersync
 forge add pgadmin
 ```
 
-Project structure:
+Project structure after `forge compose`:
 
 ```text
 my-app/
 ├── docker-compose.yml
 └── ops/
-    └── services/
     ├── web/
     │   └── service.yml
     ├── postgres/
@@ -86,16 +93,16 @@ my-app/
     ├── powersync/
     │   └── service.yml
     └── pgadmin/
-      └── service.yml
+        └── service.yml
 ```
 
-Compose services using Docker Compose `extends`:
+Generated `docker-compose.yml`:
 
 ```yaml
 services:
   web:
     extends:
-      file: ops/services/web/service.yml
+      file: ops/web/service.yml
       service: web
 
     container_name: my_app_web
@@ -108,17 +115,17 @@ services:
 
   postgres:
     extends:
-      file: ops/services/postgres/service.yml
+      file: ops/postgres/service.yml
       service: postgres
 
   redis:
     extends:
-      file: ops/services/redis/service.yml
+      file: ops/redis/service.yml
       service: redis
 
   powersync:
     extends:
-      file: ops/services/powersync/service.yml
+      file: ops/powersync/service.yml
       service: powersync
 
     depends_on:

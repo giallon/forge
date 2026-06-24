@@ -6,6 +6,15 @@ COMMAND="${1:-}"
 MODULE="${2:-}"
 
 CATALOG_DIR="$(dirname "$0")/../catalog"
+COMPOSE_OUTPUT_FILE="docker-compose.yml"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  forge add <module>
+  forge compose
+EOF
+}
 
 find_module_dir() {
   local module_name="$1"
@@ -31,20 +40,101 @@ find_module_dir() {
   printf '%s\n' "${matches[0]}"
 }
 
-if [[ "$COMMAND" != "add" || -z "$MODULE" ]]; then
-  echo "Usage: forge add <module>"
+find_project_service_files() {
+  local service_files=()
+  local path
+
+  if [[ ! -d ops ]]; then
+    echo "Project ops directory not found: ops" >&2
+    exit 1
+  fi
+
+  while IFS= read -r -d '' path; do
+    service_files+=("$path")
+  done < <(find ops -mindepth 2 -maxdepth 2 -type f -name 'service.yml' -print0 | sort -z)
+
+  if [[ ${#service_files[@]} -eq 0 ]]; then
+    echo "No service manifests found under ops/*/service.yml" >&2
+    exit 1
+  fi
+
+  printf '%s\n' "${service_files[@]}"
+}
+
+extract_service_name() {
+  local service_file="$1"
+  local service_name
+
+  service_name="$(awk '
+    $0 ~ /^services?:[[:space:]]*$/ { in_services = 1; next }
+    in_services && $0 ~ /^  [^[:space:]][^:]*:[[:space:]]*$/ {
+      line = $0
+      sub(/^  /, "", line)
+      sub(/:[[:space:]]*$/, "", line)
+      print line
+      exit
+    }
+  ' "$service_file")"
+
+  if [[ -z "$service_name" ]]; then
+    echo "Could not determine service name from $service_file" >&2
+    exit 1
+  fi
+
+  printf '%s\n' "$service_name"
+}
+
+write_compose_config() {
+  local service_files=()
+  local service_file
+  local service_dir
+  local service_name
+
+  while IFS= read -r service_file; do
+    service_files+=("$service_file")
+  done < <(find_project_service_files)
+
+  {
+    printf 'services:\n'
+    printf '\n'
+
+    for service_file in "${service_files[@]}"; do
+      service_dir="$(basename "$(dirname "$service_file")")"
+      service_name="$(extract_service_name "$service_file")"
+
+      printf '  %s:\n' "$service_name"
+      printf '    extends:\n'
+      printf '      file: ops/%s/service.yml\n' "$service_dir"
+      printf '      service: %s\n' "$service_name"
+      printf '\n'
+    done
+  } > "$COMPOSE_OUTPUT_FILE"
+
+  echo "Wrote $COMPOSE_OUTPUT_FILE"
+}
+
+if [[ -z "$COMMAND" ]]; then
+  usage
   exit 1
 fi
 
 case "$COMMAND" in
   add)
+    if [[ -z "$MODULE" ]]; then
+      usage
+      exit 1
+    fi
+
     MODULE_DIR="$(find_module_dir "$MODULE")"
     mkdir -p ops/"$MODULE"
     cp -R "$MODULE_DIR/." ops/"$MODULE"/
     echo "Added $MODULE"
     ;;
+  compose)
+    write_compose_config
+    ;;
   *)
-    echo "Usage: forge add <module>"
+    usage
     exit 1
     ;;
 esac
