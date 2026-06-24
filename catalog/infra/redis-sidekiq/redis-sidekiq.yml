@@ -1,19 +1,17 @@
 services:
   redis-sidekiq:
-    image: redis:8-alpine
-    container_name: redis-sidekiq
-    restart: unless-stopped
+    image: redis:7
+    environment:
+      REDIS_SIDEKIQ_PORT: ${REDIS_SIDEKIQ_PORT:-6379}
     ports:
-      - "6379:6379"
+      - "${REDIS_SIDEKIQ_PORT}:6379"
     volumes:
-      - redis-sidekiq-data:/data
-    command: >
-      redis-server
-      --appendonly yes
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
+      interval: 5s
+      start_period: 5s
       timeout: 10s
-      retries: 5
+      retries: 3
 volumes:
-  redis-sidekiq-data:
+  redis_data:
