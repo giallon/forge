@@ -66,6 +66,14 @@ forge compose
 
 This writes `docker-compose.yml` in the current project root.
 
+Generate a root `.env.example` by combining module environment templates:
+
+```bash
+forge env
+```
+
+This reads `ops/*/env.example` and writes a project-level `.env.example`.
+
 ## Example
 
 Add reusable services from Forge:
