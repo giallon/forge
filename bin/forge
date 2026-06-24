@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+COMMAND="$1"
+MODULE="$2"
+
+CATALOG_DIR="$(dirname "$0")/../catalog"
+
+case "$COMMAND" in
+  add)
+    mkdir -p ops/"$MODULE"
+    cp -R "$CATALOG_DIR/$MODULE/ops/." ops/"$MODULE"/
+    echo "Added $MODULE"
+    ;;
+  *)
+    echo "Usage: forge add <module>"
+    exit 1
+    ;;
+esac
