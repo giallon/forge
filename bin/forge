@@ -84,11 +84,52 @@ extract_service_name() {
   printf '%s\n' "$service_name"
 }
 
+extract_named_volumes() {
+  local service_file="$1"
+
+  awk '
+    $0 ~ /^volumes:[[:space:]]*$/ {
+      in_volumes = 1
+      next
+    }
+
+    in_volumes {
+      if ($0 ~ /^  [^[:space:]][^:]*:[[:space:]]*$/) {
+        line = $0
+        sub(/^  /, "", line)
+        sub(/:[[:space:]]*$/, "", line)
+        print line
+        next
+      }
+
+      if ($0 ~ /^[^[:space:]]/ && $0 !~ /^volumes:[[:space:]]*$/) {
+        in_volumes = 0
+      }
+    }
+  ' "$service_file"
+}
+
+array_contains() {
+  local needle="$1"
+  shift
+  local item
+
+  for item in "$@"; do
+    if [[ "$item" == "$needle" ]]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
 write_compose_config() {
   local service_files=()
+  local named_volumes=()
   local service_file
   local service_dir
   local service_name
+  local volume_name
 
   while IFS= read -r service_file; do
     service_files+=("$service_file")
@@ -102,12 +143,31 @@ write_compose_config() {
       service_dir="$(basename "$(dirname "$service_file")")"
       service_name="$(extract_service_name "$service_file")"
 
+      while IFS= read -r volume_name; do
+        if [[ ${#named_volumes[@]} -eq 0 ]]; then
+          named_volumes+=("$volume_name")
+          continue
+        fi
+
+        if ! array_contains "$volume_name" "${named_volumes[@]}"; then
+          named_volumes+=("$volume_name")
+        fi
+      done < <(extract_named_volumes "$service_file")
+
       printf '  %s:\n' "$service_name"
       printf '    extends:\n'
       printf '      file: ops/%s/service.yml\n' "$service_dir"
       printf '      service: %s\n' "$service_name"
       printf '\n'
     done
+
+    if [[ ${#named_volumes[@]} -gt 0 ]]; then
+      printf 'volumes:\n'
+
+      for volume_name in "${named_volumes[@]}"; do
+        printf '  %s:\n' "$volume_name"
+      done
+    fi
   } > "$COMPOSE_OUTPUT_FILE"
 
   echo "Wrote $COMPOSE_OUTPUT_FILE"
