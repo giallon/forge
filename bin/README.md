@@ -58,6 +58,77 @@ ops/
 └── powersync/
 ```
 
+## Example
+
+Add reusable services from Forge:
+
+```bash
+forge add web
+forge add postgres
+forge add redis
+forge add powersync
+forge add pgadmin
+```
+
+Project structure:
+
+```text
+my-app/
+├── docker-compose.yml
+└── ops/
+    └── services/
+        ├── web.yml
+        ├── postgres.yml
+        ├── redis.yml
+        ├── powersync.yml
+        └── pg_admin.yml
+```
+
+Compose services using Docker Compose `extends`:
+
+```yaml
+services:
+  web:
+    extends:
+      file: ops/services/web.yml
+      service: web
+
+    container_name: my_app_web
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgres:
+    extends:
+      file: ops/services/postgres.yml
+      service: postgres
+
+  redis:
+    extends:
+      file: ops/services/redis.yml
+      service: redis
+
+  powersync:
+    extends:
+      file: ops/services/powersync.yml
+      service: powersync
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+```
+
+Start the stack:
+
+```bash
+docker compose up -d
+```
+
+Forge provides reusable service definitions while the application remains responsible for orchestration and customization.
+
 ## Goals
 
 * Build a reusable engineering catalog
