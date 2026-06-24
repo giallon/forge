@@ -77,11 +77,16 @@ my-app/
 ├── docker-compose.yml
 └── ops/
     └── services/
-        ├── web.yml
-        ├── postgres.yml
-        ├── redis.yml
-        ├── powersync.yml
-        └── pg_admin.yml
+    ├── web/
+    │   └── service.yml
+    ├── postgres/
+    │   └── service.yml
+    ├── redis/
+    │   └── service.yml
+    ├── powersync/
+    │   └── service.yml
+    └── pgadmin/
+      └── service.yml
 ```
 
 Compose services using Docker Compose `extends`:
@@ -90,7 +95,7 @@ Compose services using Docker Compose `extends`:
 services:
   web:
     extends:
-      file: ops/services/web.yml
+      file: ops/services/web/service.yml
       service: web
 
     container_name: my_app_web
@@ -103,17 +108,17 @@ services:
 
   postgres:
     extends:
-      file: ops/services/postgres.yml
+      file: ops/services/postgres/service.yml
       service: postgres
 
   redis:
     extends:
-      file: ops/services/redis.yml
+      file: ops/services/redis/service.yml
       service: redis
 
   powersync:
     extends:
-      file: ops/services/powersync.yml
+      file: ops/services/powersync/service.yml
       service: powersync
 
     depends_on:
