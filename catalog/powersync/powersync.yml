@@ -1,0 +1,36 @@
+services:
+  powersync:
+    image: journeyapps/powersync-service:1.20.1
+
+    command:
+      - start
+      - -r
+      - unified
+
+    environment:
+      POWERSYNC_CONFIG_PATH: /config/sync-service.yml
+      NODE_OPTIONS: --max-old-space-size=1000
+      PS_DATA_SOURCE_URI: ${PS_DATA_SOURCE_URI}
+      PS_JWKS_URL: ${PS_JWKS_URL}
+      PS_PORT: ${PS_PORT}
+
+    volumes:
+      - ../config:/config
+
+    ports:
+      - "${PS_PORT}:${PS_PORT}"
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:${PS_PORT}/probes/liveness').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
+        ]
+
+      interval: 5s
+      timeout: 1s
+      retries: 15
+
+    restart: unless-stopped
