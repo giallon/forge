@@ -5,7 +5,6 @@ OPS_SERVICES_DIR="ops/services"
 OPS_ENV_DIR="ops/env"
 OPS_CONFIG_DIR="ops/config"
 OPS_SCRIPTS_DIR="ops/scripts"
-OPS_DOCKER_DIR="ops/docker"
 
 usage() {
   cat <<'EOF'

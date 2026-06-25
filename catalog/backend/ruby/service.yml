@@ -2,7 +2,7 @@ services:
   ruby:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ../config/ruby/Dockerfile
     working_dir: /workspaces
     volumes:
       - ../..:/workspaces
