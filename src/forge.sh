@@ -8,6 +8,7 @@ fi
 
 source "$FORGE_ROOT_DIR/src/lib/common.sh"
 source "$FORGE_ROOT_DIR/src/commands/add.sh"
+source "$FORGE_ROOT_DIR/src/commands/remove.sh"
 source "$FORGE_ROOT_DIR/src/commands/list.sh"
 source "$FORGE_ROOT_DIR/src/commands/compose.sh"
 source "$FORGE_ROOT_DIR/src/commands/env.sh"
@@ -29,6 +30,14 @@ forge_main() {
       fi
 
       forge_cmd_add "$module"
+      ;;
+    remove)
+      if [[ -z "$module" ]]; then
+        usage
+        exit 1
+      fi
+
+      forge_cmd_remove "$module"
       ;;
     list)
       forge_cmd_list

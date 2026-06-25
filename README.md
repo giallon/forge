@@ -46,6 +46,12 @@ Add a module to the current project:
 forge add postgis
 ```
 
+Remove a module from the current project:
+
+```bash
+forge remove postgis
+```
+
 List available modules:
 
 ```bash

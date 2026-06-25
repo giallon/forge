@@ -11,6 +11,7 @@ usage() {
   cat <<'EOF'
 Usage:
   forge add <module>
+  forge remove <module>
   forge list
   forge compose
   forge env
