@@ -46,6 +46,12 @@ Add a module to the current project:
 forge add postgis
 ```
 
+List available modules:
+
+```bash
+forge list
+```
+
 This copies the module files into the project's `ops/` directory.
 
 Example:

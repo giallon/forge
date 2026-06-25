@@ -8,6 +8,7 @@ fi
 
 source "$FORGE_ROOT_DIR/src/lib/common.sh"
 source "$FORGE_ROOT_DIR/src/commands/add.sh"
+source "$FORGE_ROOT_DIR/src/commands/list.sh"
 source "$FORGE_ROOT_DIR/src/commands/compose.sh"
 source "$FORGE_ROOT_DIR/src/commands/env.sh"
 
@@ -28,6 +29,9 @@ forge_main() {
       fi
 
       forge_cmd_add "$module"
+      ;;
+    list)
+      forge_cmd_list
       ;;
     compose)
       forge_cmd_compose

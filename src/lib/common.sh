@@ -11,6 +11,7 @@ usage() {
   cat <<'EOF'
 Usage:
   forge add <module>
+  forge list
   forge compose
   forge env
   forge bootstrap
@@ -143,4 +144,18 @@ array_contains() {
   done
 
   return 1
+}
+
+list_catalog_modules() {
+  local service_file
+  local module_dir
+  local module_name
+  local module_rel_path
+
+  while IFS= read -r -d '' service_file; do
+    module_dir="$(dirname "$service_file")"
+    module_name="$(basename "$module_dir")"
+    module_rel_path="${module_dir#"$CATALOG_DIR"/}"
+    printf '%s\t%s\n' "$module_name" "$module_rel_path"
+  done < <(find "$CATALOG_DIR" -type f -name 'service.yml' -print0 | sort -z)
 }
