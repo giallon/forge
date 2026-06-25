@@ -242,7 +242,7 @@ case "$COMMAND" in
     fi
 
     MODULE_DIR="$(find_module_dir "$MODULE")"
-    mkdir -p "$OPS_SERVICES_DIR" "$OPS_ENV_DIR" "$OPS_CONFIG_DIR" "$OPS_SCRIPTS_DIR" "$OPS_DOCKER_DIR/$MODULE"
+    mkdir -p "$OPS_SERVICES_DIR" "$OPS_ENV_DIR" "$OPS_CONFIG_DIR" "$OPS_SCRIPTS_DIR" "$OPS_DOCKER_DIR"
 
     if [[ -f "$MODULE_DIR/service.yml" ]]; then
       cp "$MODULE_DIR/service.yml" "$OPS_SERVICES_DIR/$MODULE.yml"
@@ -265,8 +265,9 @@ case "$COMMAND" in
 
     while IFS= read -r -d '' dockerfile_path; do
       dockerfile_name="$(basename "$dockerfile_path")"
-      cp "$dockerfile_path" "$OPS_DOCKER_DIR/$MODULE/$dockerfile_name"
-      sed -E -i '' "s|^([[:space:]]*dockerfile:[[:space:]]*)([\"']?)${dockerfile_name}([\"']?)[[:space:]]*$|\\1\\2../docker/$MODULE/$dockerfile_name\\3|" "$OPS_SERVICES_DIR/$MODULE.yml"
+      dockerfile_target_name="${dockerfile_name}.${MODULE}"
+      cp "$dockerfile_path" "$OPS_DOCKER_DIR/$dockerfile_target_name"
+      sed -E -i '' "s|^([[:space:]]*dockerfile:[[:space:]]*)([\"']?)${dockerfile_name}([\"']?)[[:space:]]*$|\\1\\2../docker/$dockerfile_target_name\\3|" "$OPS_SERVICES_DIR/$MODULE.yml"
     done < <(find "$MODULE_DIR" -mindepth 1 -maxdepth 1 -type f -name 'Dockerfile*' -print0)
 
     # Backward compatibility for legacy modules that keep extra project assets

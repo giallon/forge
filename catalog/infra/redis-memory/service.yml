@@ -13,6 +13,7 @@ services:
       --save ""
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
+      interval: 5s
+      start_period: 5s
       timeout: 10s
-      retries: 5
+      retries: 3
