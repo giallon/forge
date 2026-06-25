@@ -26,10 +26,14 @@ Examples:
 
 ```text
 catalog/
-├── postgis/
-├── redis-sidekiq/
-├── powersync/
-└── rails-api/
+└── <category>/
+  └── <module>/
+    ├── service.yml
+    ├── env.example
+    ├── files/
+    │   ├── config/
+    │   └── scripts/
+    └── README.md
 ```
 
 Each module contains the files, configuration, and documentation required to reuse it.
@@ -54,8 +58,12 @@ Result:
 
 ```text
 ops/
-├── postgis/
-└── powersync/
+├── config/
+├── env/
+│   └── powersync.env.example
+├── scripts/
+└── services/
+  └── powersync.yml
 ```
 
 Generate a root Docker Compose file from the copied module manifests:
@@ -72,7 +80,15 @@ Generate a root `.env.example` by combining module environment templates:
 forge env
 ```
 
-This reads `ops/*/env.example` and writes a project-level `.env.example`.
+This reads `ops/env/*.env.example` and writes a project-level `.env.example`.
+
+Optional shortcut:
+
+```bash
+forge bootstrap
+```
+
+This runs `forge compose` and `forge env`.
 
 ## Example
 
@@ -92,53 +108,37 @@ Project structure after `forge compose`:
 my-app/
 ├── docker-compose.yml
 └── ops/
-    ├── web/
-    │   └── service.yml
-    ├── postgres/
-    │   └── service.yml
-    ├── redis/
-    │   └── service.yml
-    ├── powersync/
-    │   └── service.yml
-    └── pgadmin/
-        └── service.yml
+  ├── config/
+  ├── env/
+  │   ├── pgadmin.env.example
+  │   ├── postgres.env.example
+  │   └── redis.env.example
+  ├── scripts/
+  └── services/
+    ├── pgadmin.yml
+    ├── postgres.yml
+    ├── powersync.yml
+    └── redis.yml
 ```
 
 Generated `docker-compose.yml`:
 
 ```yaml
 services:
-  web:
-    extends:
-      file: ops/web/service.yml
-      service: web
-
-    container_name: my_app_web
-
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
   postgres:
     extends:
-      file: ops/postgres/service.yml
+      file: ops/services/postgres.yml
       service: postgres
 
   redis:
     extends:
-      file: ops/redis/service.yml
+      file: ops/services/redis.yml
       service: redis
 
   powersync:
     extends:
-      file: ops/powersync/service.yml
+      file: ops/services/powersync.yml
       service: powersync
-
-    depends_on:
-      postgres:
-        condition: service_healthy
 ```
 
 Start the stack:
