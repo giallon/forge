@@ -4,6 +4,10 @@ Forge is a personal engineering catalog of reusable technologies, configurations
 
 Instead of solving the same setup problems repeatedly, Forge lets you capture proven solutions and reuse them across projects.
 
+## Repository
+
+Demo repository: https://github.com/giallon/test_forge
+
 ## Philosophy
 
 When a technology becomes stable and reusable:
