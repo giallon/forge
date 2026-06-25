@@ -2,9 +2,9 @@ CATALOG_DIR="$FORGE_ROOT_DIR/catalog"
 COMPOSE_OUTPUT_FILE="docker-compose.yml"
 ENV_OUTPUT_FILE=".env.example"
 OPS_SERVICES_DIR="ops/services"
-OPS_ENV_DIR="ops/env"
 OPS_CONFIG_DIR="ops/config"
 OPS_SCRIPTS_DIR="ops/scripts"
+OPS_TEMPLATES_DIR="ops/templates"
 
 usage() {
   cat <<'EOF'
@@ -63,25 +63,6 @@ find_project_service_files() {
   fi
 
   printf '%s\n' "${service_files[@]}"
-}
-
-find_project_env_files() {
-  local env_files=()
-  local path
-
-  if [[ ! -d "$OPS_ENV_DIR" ]]; then
-    return 0
-  fi
-
-  while IFS= read -r -d '' path; do
-    env_files+=("$path")
-  done < <(find "$OPS_ENV_DIR" -maxdepth 1 -type f -name '*.env.example' -print0 | sort -z)
-
-  if [[ ${#env_files[@]} -eq 0 ]]; then
-    return 0
-  fi
-
-  printf '%s\n' "${env_files[@]}"
 }
 
 extract_service_name() {

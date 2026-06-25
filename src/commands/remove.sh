@@ -7,11 +7,6 @@ forge_cmd_remove() {
     removed=1
   fi
 
-  if [[ -f "$OPS_ENV_DIR/$module.env.example" ]]; then
-    rm -f "$OPS_ENV_DIR/$module.env.example"
-    removed=1
-  fi
-
   if [[ "$removed" -eq 0 ]]; then
     echo "Module not present in project: $module" >&2
     exit 1

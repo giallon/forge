@@ -4,7 +4,7 @@ forge_cmd_add() {
 
   module_dir="$(find_module_dir "$module")"
 
-  mkdir -p "$OPS_SERVICES_DIR" "$OPS_ENV_DIR" "$OPS_CONFIG_DIR" "$OPS_SCRIPTS_DIR"
+  mkdir -p "$OPS_SERVICES_DIR" "$OPS_CONFIG_DIR" "$OPS_SCRIPTS_DIR" "$OPS_TEMPLATES_DIR"
 
   if [[ -f "$module_dir/service.yml" ]]; then
     cp "$module_dir/service.yml" "$OPS_SERVICES_DIR/$module.yml"
@@ -13,16 +13,16 @@ forge_cmd_add() {
     exit 1
   fi
 
-  if [[ -f "$module_dir/env.example" ]]; then
-    cp "$module_dir/env.example" "$OPS_ENV_DIR/$module.env.example"
-  fi
-
   if [[ -d "$module_dir/files/config" ]]; then
     cp -R "$module_dir/files/config/." "$OPS_CONFIG_DIR/"
   fi
 
   if [[ -d "$module_dir/files/scripts" ]]; then
     cp -R "$module_dir/files/scripts/." "$OPS_SCRIPTS_DIR/"
+  fi
+
+  if [[ -d "$module_dir/files/templates" ]]; then
+    cp -R "$module_dir/files/templates/." "$OPS_TEMPLATES_DIR/"
   fi
 
   echo "Added $module"
